@@ -49,7 +49,7 @@ function update(site, buy, sell, timestamp) {
 
 
 // cada 15 minutos
-cron.schedule('* * * * *', function(){ //*/15 * * * *
+cron.schedule('*/15 * * * *', function(){
     var timestamp = new Date().getTime();
     pushQueue(timestamp)
 });
