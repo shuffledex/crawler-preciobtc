@@ -40,8 +40,9 @@ function update(site, buy, sell, timestamp) {
     hopperRef.update(o, function(error) {
       if (error) {
         Raven.captureException(error, { extra: { key: 'Firebase: Data could not be saved.' } });
+        console.log("Firebase: Data could not be saved for " + site)
       } else {
-        //console.log("Data for " + site + " saved successfully.");
+        console.log("Data for " + site + " saved successfully.");
       }
     });
 }
@@ -71,7 +72,7 @@ function pushQueue(timestamp) {
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: Ripio' } });
-                    //console.log("Reportar error")
+                    console.log("ERROR Crawler: Ripio")
                 }
             }
             done();
@@ -91,7 +92,7 @@ function pushQueue(timestamp) {
                     update("VentaBTC", buy, 0, timestamp)
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: VentaBTC' } });
-                    //console.log("Reportar error")
+                    console.log("ERROR Crawler: VentaBTC")
                 }
             }
             done();
@@ -115,7 +116,7 @@ function pushQueue(timestamp) {
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: BuenBit' } });
-                    //console.log("Reportar error")
+                    console.log("ERROR Crawler: BuenBit")
                 }
             }
             done();
@@ -139,7 +140,7 @@ function pushQueue(timestamp) {
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: ArgenBTC' } });
-                    //console.log("Reportar error")
+                    console.log("ERROR Crawler: ArgenBTC")
                 }
             }
             done();
@@ -168,7 +169,7 @@ function pushQueue(timestamp) {
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: Bitinka' } });
-                    //console.log("Reportar error")
+                    console.log("ERROR Crawler: bitinka")
                 }
             }
             done();
@@ -192,7 +193,7 @@ function pushQueue(timestamp) {
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: CryptoMKT' } });
-                    //console.log("Reportar error")
+                    console.log("ERROR Crawler: CryptoMKT")
                 }
             }
             done();
@@ -216,7 +217,7 @@ function pushQueue(timestamp) {
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: SatoshiTango' } });
-                    //onsole.log("Reportar error")
+                    console.log("ERROR Crawler: SatoshiTango")
                 }
             }
             done();
@@ -237,7 +238,7 @@ function pushQueue(timestamp) {
                     update("Saldo", buy, sell, timestamp)
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: Saldo' } });
-                    //console.log("Reportar error")
+                    console.log("ERROR Crawler: Saldo")
                 }
             }
             done();
@@ -261,7 +262,7 @@ function pushQueue(timestamp) {
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: Buda' } });
-                    //console.log("Reportar error")
+                    console.log("ERROR Crawler: Buda")
                 }
             }
             done();
@@ -282,7 +283,7 @@ function pushQueue(timestamp) {
                     update("CoinASAP", buy, null, timestamp)
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: CoinASAP purchase' } });
-                    //console.log("Reportar error")
+                    console.log("ERROR Crawler: CoinASAP purchase")
                 }
             }
             done();
@@ -302,7 +303,7 @@ function pushQueue(timestamp) {
                     update("CoinASAP", null, sell, timestamp)
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: CoinASAP cash out' } });
-                    //console.log("Reportar error")
+                    console.log("ERROR Crawler: CoinASAP cash out")
                 }
             }
             done();
