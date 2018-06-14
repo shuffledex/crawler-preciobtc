@@ -47,6 +47,33 @@ function update(site, buy, sell, timestamp) {
     });
 }
 
+function updateDolar(compra, venta, timestamp) {
+    var ref = db.ref("dolar/ARS");
+    ref.update({
+        compra: compra,
+        venta: venta,
+        timestamp: timestamp
+    }, function(error) {
+      if (error) {
+        Raven.captureException(error, { extra: { key: 'Firebase: Data could not be saved.' } });
+        console.log("Firebase: Data could not be saved for " + site)
+      } else {
+        console.log("Data for dolar ARS saved successfully.");
+      }
+    });
+}
+
+function updateGlobalMarket(json, name) {
+    var ref = db.ref(name);
+    ref.update(json, function(error) {
+      if (error) {
+        Raven.captureException(error, { extra: { key: 'Firebase: Data could not be saved.' } });
+        console.log("Firebase: Data could not be saved for " + site)
+      } else {
+        console.log("Data for " + name + " saved successfully.");
+      }
+    });
+}
 
 // cada 15 minutos
 cron.schedule('*/15 * * * *', function(){
@@ -309,9 +336,68 @@ function pushQueue(timestamp) {
             done();
         }
     }]);
+
+    c.queue([{
+        uri: 'https://www.bitstamp.net/api/v2/ticker/btcusd/',
+        jQuery: false,
+        callback: function (error, res, done) {
+            if(error){
+                console.log(error);
+            }else{
+                try {
+                    var json = JSON.parse(res.body);
+                    updateGlobalMarket(json, "bitstamp");
+                } catch(err) {
+                    Raven.captureException(err, { extra: { key: 'Crawler: bitstamp' } });
+                    console.log("ERROR Crawler: bitstamp")
+                }
+            }
+            done();
+        }
+    }]);
+
+    c.queue([{
+        uri: 'https://api.bitfinex.com/v1/pubticker/BTCUSD',
+        jQuery: false,
+        callback: function (error, res, done) {
+            if(error){
+                console.log(error);
+            }else{
+                try {
+                    var json = JSON.parse(res.body);
+                    updateGlobalMarket(json, "bitfinex");
+                } catch(err) {
+                    Raven.captureException(err, { extra: { key: 'Crawler: bitfinex' } });
+                    console.log("ERROR Crawler: bitfinex")
+                }
+            }
+            done();
+        }
+    }]);
+
+    c.queue([{
+        uri: 'https://www.cronista.com/MercadosOnline/json/getValoresCalculadora.html',
+        jQuery: false,
+        callback: function (error, res, done) {
+            if(error){
+                console.log(error);
+            }else{
+                try {
+                    var json = JSON.parse(res.body);
+                    var compra = parseFloat(json[0].Compra);
+                    var venta = parseFloat(json[0].Venta);
+                    updateDolar(compra, venta, timestamp);
+                } catch(err) {
+                    Raven.captureException(err, { extra: { key: 'Crawler: cronista' } });
+                    console.log("ERROR Crawler: cronista")
+                }
+            }
+            done();
+        }
+    }]);
 }
 
-c.on('drain',function(){
-    //process.exit()
-    //console.log("TERMINO COLA")
-});
+/*c.on('drain',function(){
+    process.exit()
+    console.log("TERMINO COLA")
+});*/
