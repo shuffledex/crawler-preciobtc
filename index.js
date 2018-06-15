@@ -259,8 +259,8 @@ function pushQueue(timestamp) {
             }else{
                 try {
                     var $ = res.$;
-                    var buy = parseFloat($('tr:nth-child(4) td:nth-child(2)', '#cotizaciones').text());
-                    var sell = parseFloat($('tr:nth-child(4) td:nth-child(3)', '#cotizaciones').text());
+                    var sell = parseFloat($('tr:nth-child(4) td:nth-child(2)', '#cotizaciones').text());
+                    var buy = parseFloat($('tr:nth-child(4) td:nth-child(3)', '#cotizaciones').text());
                     //console.log(buy, sell)
                     update("Saldo", buy, sell, timestamp)
                 } catch(err) {
