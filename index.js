@@ -95,7 +95,11 @@ function pushQueue(timestamp) {
                     var sell = json.rates.ARS_SELL;
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
-                        update("Ripio", buy, sell, timestamp)
+                        if (sell < buy) {
+                            update("Ripio", sell, buy, timestamp)
+                        } else {
+                            update("Ripio", buy, sell, timestamp)
+                        }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: Ripio' } });
@@ -139,7 +143,11 @@ function pushQueue(timestamp) {
                     var sell = json.rates.ARS_SELL;
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
-                        update("BuenBit", buy, sell, timestamp)
+                        if (sell < buy) {
+                            update("BuenBit", sell, buy, timestamp)
+                        } else {
+                            update("BuenBit", buy, sell, timestamp)
+                        }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: BuenBit' } });
@@ -163,7 +171,11 @@ function pushQueue(timestamp) {
                     var sell = json.precio_venta;
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
-                        update("ArgenBTC", buy, sell, timestamp)
+                        if (sell < buy) {
+                            update("ArgenBTC", sell, buy, timestamp)
+                        } else {
+                            update("ArgenBTC", buy, sell, timestamp)
+                        }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: ArgenBTC' } });
@@ -192,7 +204,11 @@ function pushQueue(timestamp) {
                     var sell = parseFloat(json.ARS.venta);
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
-                        update("Bitinka", buy, sell, timestamp)
+                        if (sell < buy) {
+                            update("Bitinka", sell, buy, timestamp)
+                        } else {
+                            update("Bitinka", buy, sell, timestamp)
+                        }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: Bitinka' } });
@@ -216,7 +232,11 @@ function pushQueue(timestamp) {
                     var sell = parseFloat(json.data[0].bid);
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
-                        update("CryptoMKT", buy, sell, timestamp)
+                        if (sell < buy) {
+                            update("CryptoMKT", sell, buy, timestamp)
+                        } else {
+                            update("CryptoMKT", buy, sell, timestamp)
+                        }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: CryptoMKT' } });
@@ -240,7 +260,11 @@ function pushQueue(timestamp) {
                     var sell = parseFloat(json.data.venta.arsbtc);
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
-                        update("SatoshiTango", buy, sell, timestamp)
+                        if (sell < buy) {
+                            update("SatoshiTango", sell, buy, timestamp)
+                        } else {
+                            update("SatoshiTango", buy, sell, timestamp)
+                        }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: SatoshiTango' } });
@@ -262,7 +286,11 @@ function pushQueue(timestamp) {
                     var sell = parseFloat($('tr:nth-child(4) td:nth-child(2)', '#cotizaciones').text());
                     var buy = parseFloat($('tr:nth-child(4) td:nth-child(3)', '#cotizaciones').text());
                     //console.log(buy, sell)
-                    update("Saldo", buy, sell, timestamp)
+                    if (sell < buy) {
+                        update("Saldo", sell, buy, timestamp)
+                    } else {
+                        update("Saldo", buy, sell, timestamp)
+                    }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: Saldo' } });
                     console.log("ERROR Crawler: Saldo")
@@ -285,7 +313,11 @@ function pushQueue(timestamp) {
                     var sell = parseFloat(json.ticker.max_bid);
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
-                        update("Buda", buy, sell, timestamp)
+                        if (sell < buy) {
+                            update("Buda", sell, buy, timestamp)
+                        } else {
+                            update("Buda", buy, sell, timestamp)
+                        }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: Buda' } });
