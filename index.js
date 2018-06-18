@@ -91,8 +91,8 @@ function pushQueue(timestamp) {
             }else{
                 try {
                     var json = JSON.parse(res.body);
-                    var sell = json.rates.ARS_BUY;
-                    var buy = json.rates.ARS_SELL;
+                    var buy = json.rates.ARS_BUY;
+                    var sell = json.rates.ARS_SELL;
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
                         update("Ripio", buy, sell, timestamp)
@@ -135,8 +135,8 @@ function pushQueue(timestamp) {
             }else{
                 try {
                     var json = JSON.parse(res.body);
-                    var sell = json.rates.ARS_BUY;
-                    var buy = json.rates.ARS_SELL;
+                    var buy = json.rates.ARS_BUY;
+                    var sell = json.rates.ARS_SELL;
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
                         update("BuenBit", buy, sell, timestamp)
@@ -159,8 +159,8 @@ function pushQueue(timestamp) {
             }else{
                 try {
                     var json = JSON.parse(res.body);
-                    var sell = json.precio_compra;
-                    var buy = json.precio_venta;
+                    var buy = json.precio_compra;
+                    var sell = json.precio_venta;
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
                         update("ArgenBTC", buy, sell, timestamp)
@@ -188,8 +188,8 @@ function pushQueue(timestamp) {
             }else{
                 try {
                     var json = JSON.parse(res.body);
-                    var sell = parseFloat(json.ARS.compra);
-                    var buy = parseFloat(json.ARS.venta);
+                    var buy = parseFloat(json.ARS.compra);
+                    var sell = parseFloat(json.ARS.venta);
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
                         update("Bitinka", buy, sell, timestamp)
@@ -212,8 +212,8 @@ function pushQueue(timestamp) {
             }else{
                 try {
                     var json = JSON.parse(res.body);
-                    var sell = parseFloat(json.data[0].ask);
-                    var buy = parseFloat(json.data[0].bid);
+                    var buy = parseFloat(json.data[0].ask);
+                    var sell = parseFloat(json.data[0].bid);
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
                         update("CryptoMKT", buy, sell, timestamp)
@@ -236,8 +236,8 @@ function pushQueue(timestamp) {
             }else{
                 try {
                     var json = JSON.parse(res.body);
-                    var sell = parseFloat(json.data.compra.arsbtc);
-                    var buy = parseFloat(json.data.venta.arsbtc);
+                    var buy = parseFloat(json.data.compra.arsbtc);
+                    var sell = parseFloat(json.data.venta.arsbtc);
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
                         update("SatoshiTango", buy, sell, timestamp)
@@ -281,8 +281,8 @@ function pushQueue(timestamp) {
             }else{
                 try {
                     var json = JSON.parse(res.body);
-                    var sell = parseFloat(json.ticker.min_ask);
-                    var buy = parseFloat(json.ticker.max_bid);
+                    var buy = parseFloat(json.ticker.min_ask);
+                    var sell = parseFloat(json.ticker.max_bid);
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
                         update("Buda", buy, sell, timestamp)
