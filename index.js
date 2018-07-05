@@ -328,7 +328,49 @@ function pushQueue(timestamp) {
         }
     }]);
 
+    c.queue([{
+        uri: 'http://www.qubit.com.ar/c_value',
+        jQuery: false,
+        callback: function (error, res, done) {
+            if(error){
+                console.log(error);
+            }else{
+                try {
+                    var json = JSON.parse(res.body);
+                    var buy = parseFloat(json.BTC[2]);
+                    //console.log(buy)
+                    update("Qubit", buy, 0, timestamp)
+                } catch(err) {
+                    Raven.captureException(err, { extra: { key: 'Crawler: Qubit' } });
+                    console.log("ERROR Crawler: Qubit")
+                }
+            }
+            done();
+        }
+    }]);
+
     /*c.queue([{
+        uri: 'https://www.bitarg.com/',
+        callback: function (error, res, done) {
+            if(error){
+                console.log(error);
+            }else{
+                try {
+                    var $ = res.$;
+                    var buy = parseFloat($('.tp-banner .lfl').text().replace(/[^0-9\.\,]/g,''));
+                    var sell = parseFloat($('.tp-banner .lfr').text().replace(/[^0-9\.\,]/g,''));
+                    //console.log(buy, sell)
+                    update("BitArg", buy, sell, timestamp)
+                } catch(err) {
+                    Raven.captureException(err, { extra: { key: 'Crawler: BitArg' } });
+                    console.log("ERROR Crawler: BitArg")
+                }
+            }
+            done();
+        }
+    }]);
+
+    c.queue([{
         uri: 'https://localbitcoins.com/ad/210865/purchase-bitcoin-bank-transfer-argentina-argentina',
         callback: function (error, res, done) {
             if(error){
