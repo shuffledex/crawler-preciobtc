@@ -18,7 +18,7 @@ function isNumber(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-function update(site, buy, sell, timestamp) {
+function update(country, site, buy, sell, timestamp) {
     var o = {};
     if (buy == null && sell != null) {
         o = {
@@ -35,20 +35,19 @@ function update(site, buy, sell, timestamp) {
         }
     }
     o['timestamp'] = timestamp;
-    var ref = db.ref("sitios/ARS");
+    var ref = db.ref("sitios/" + country);
     var hopperRef = ref.child(site);
     hopperRef.update(o, function(error) {
       if (error) {
         Raven.captureException(error, { extra: { key: 'Firebase: Data could not be saved.' } });
-        console.log("Firebase: Data could not be saved for " + site)
       } else {
-        console.log("Data for " + site + " saved successfully.");
+        //console.log("Data for " + site + " saved successfully.");
       }
     });
 }
 
-function updateDolar(compra, venta, timestamp) {
-    var ref = db.ref("dolar/ARS");
+function updateDolar(country, compra, venta, timestamp) {
+    var ref = db.ref("dolar/" + country);
     ref.update({
         compra: compra,
         venta: venta,
@@ -56,9 +55,8 @@ function updateDolar(compra, venta, timestamp) {
     }, function(error) {
       if (error) {
         Raven.captureException(error, { extra: { key: 'Firebase: Data could not be saved.' } });
-        console.log("Firebase: Data could not be saved for " + site)
       } else {
-        console.log("Data for dolar ARS saved successfully.");
+        //console.log("Data for dolar ARS saved successfully.");
       }
     });
 }
@@ -68,9 +66,8 @@ function updateGlobalMarket(json, name) {
     ref.update(json, function(error) {
       if (error) {
         Raven.captureException(error, { extra: { key: 'Firebase: Data could not be saved.' } });
-        console.log("Firebase: Data could not be saved for " + site)
       } else {
-        console.log("Data for " + name + " saved successfully.");
+        //console.log("Data for " + name + " saved successfully.");
       }
     });
 }
@@ -82,6 +79,7 @@ cron.schedule('*/15 * * * *', function(){
 });
 
 function pushQueue(timestamp) {
+
     c.queue([{
         uri: 'https://www.ripio.com/api/v1/rates/',
         jQuery: false,
@@ -94,16 +92,14 @@ function pushQueue(timestamp) {
                     var buy = json.rates.ARS_BUY;
                     var sell = json.rates.ARS_SELL;
                     if(isNumber(buy) && isNumber(sell)) {
-                        //console.log(buy, sell);
                         if (sell > buy) {
-                            update("Ripio", sell, buy, timestamp)
+                            update("ARS", "Ripio", sell, buy, timestamp)
                         } else {
-                            update("Ripio", buy, sell, timestamp)
+                            update("ARS", "Ripio", buy, sell, timestamp)
                         }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: Ripio' } });
-                    console.log("ERROR Crawler: Ripio")
                 }
             }
             done();
@@ -119,11 +115,9 @@ function pushQueue(timestamp) {
                 try {
                     var $ = res.$;
                     var buy = parseFloat($("#price").text());
-                    //console.log(buy)
-                    update("VentaBTC", buy, 0, timestamp)
+                    update("ARS", "VentaBTC", buy, 0, timestamp)
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: VentaBTC' } });
-                    console.log("ERROR Crawler: VentaBTC")
                 }
             }
             done();
@@ -144,14 +138,13 @@ function pushQueue(timestamp) {
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
                         if (sell > buy) {
-                            update("BuenBit", sell, buy, timestamp)
+                            update("ARS", "BuenBit", sell, buy, timestamp)
                         } else {
-                            update("BuenBit", buy, sell, timestamp)
+                            update("ARS", "BuenBit", buy, sell, timestamp)
                         }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: BuenBit' } });
-                    console.log("ERROR Crawler: BuenBit")
                 }
             }
             done();
@@ -172,14 +165,13 @@ function pushQueue(timestamp) {
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
                         if (sell > buy) {
-                            update("ArgenBTC", sell, buy, timestamp)
+                            update("ARS", "ArgenBTC", sell, buy, timestamp)
                         } else {
-                            update("ArgenBTC", buy, sell, timestamp)
+                            update("ARS", "ArgenBTC", buy, sell, timestamp)
                         }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: ArgenBTC' } });
-                    console.log("ERROR Crawler: ArgenBTC")
                 }
             }
             done();
@@ -189,11 +181,16 @@ function pushQueue(timestamp) {
     c.queue([{
         uri: 'https://www.bitinka.com.ar/pe/bitinka/home',
         headers: {
-            Cookie: "cookie_forms=2b66a5e90f805ded6a5987ea6011dc3e; expires=Fri, 08-Jun-2030 00:06:03 GMT; Max-Age=7200; path=/"
+            Host: "www.bitinka.com",
+            Origin: "https://www.bitinka.com",
+            Pragma: "no-cache",
+            Referer: "https://www.bitinka.com/pe/bitinka/home",
+            ContentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            Cookie: "cookie_forms=8d53e2553252430f17cdc169cbfaf1d2; expires=Fri, 08-Jun-2030 00:06:03 GMT; Max-Age=7200; path=/"
         },
         jQuery: false,
         method: "POST",
-        form: {'inka_forms':'2b66a5e90f805ded6a5987ea6011dc3e', 'coin':'USD'},
+        form: {'inka_forms':'8d53e2553252430f17cdc169cbfaf1d2', 'coin':'USD'},
         callback: function (error, res, done) {
             if(error){
                 console.log(error);
@@ -202,17 +199,29 @@ function pushQueue(timestamp) {
                     var json = JSON.parse(res.body);
                     var buy = parseFloat(json.ARS.compra);
                     var sell = parseFloat(json.ARS.venta);
+
+                    var buy_cl = parseFloat(json.CLP.compra);
+                    var sell_cl = parseFloat(json.CLP.venta);
+
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
                         if (sell > buy) {
-                            update("Bitinka", sell, buy, timestamp)
+                            update("ARS", "Bitinka", sell, buy, timestamp)
                         } else {
-                            update("Bitinka", buy, sell, timestamp)
+                            update("ARS", "Bitinka", buy, sell, timestamp)
+                        }
+                    }
+
+                    if(isNumber(buy_cl) && isNumber(sell_cl)) {
+                        //console.log(buy, sell);
+                        if (sell_cl > buy_cl) {
+                            update("CL", "Bitinka", sell_cl, buy_cl, timestamp)
+                        } else {
+                            update("CL", "Bitinka", buy_cl, sell_cl, timestamp)
                         }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: Bitinka' } });
-                    console.log("ERROR Crawler: bitinka")
                 }
             }
             done();
@@ -233,14 +242,40 @@ function pushQueue(timestamp) {
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
                         if (sell > buy) {
-                            update("CryptoMKT", sell, buy, timestamp)
+                            update("ARS", "CryptoMKT", sell, buy, timestamp)
                         } else {
-                            update("CryptoMKT", buy, sell, timestamp)
+                            update("ARS", "CryptoMKT", buy, sell, timestamp)
                         }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: CryptoMKT' } });
-                    console.log("ERROR Crawler: CryptoMKT")
+                }
+            }
+            done();
+        }
+    }]);
+
+    c.queue([{
+        uri: 'https://api.cryptomkt.com/v1/ticker?market=BTCCLP',
+        jQuery: false,
+        callback: function (error, res, done) {
+            if(error){
+                console.log(error);
+            }else{
+                try {
+                    var json = JSON.parse(res.body);
+                    var buy = parseFloat(json.data[0].ask);
+                    var sell = parseFloat(json.data[0].bid);
+                    if(isNumber(buy) && isNumber(sell)) {
+                        //console.log(buy, sell);
+                        if (sell > buy) {
+                            update("CL", "CryptoMKT", sell, buy, timestamp)
+                        } else {
+                            update("CL", "CryptoMKT", buy, sell, timestamp)
+                        }
+                    }
+                } catch(err) {
+                    Raven.captureException(err, { extra: { key: 'Crawler: CryptoMKT' } });
                 }
             }
             done();
@@ -261,14 +296,13 @@ function pushQueue(timestamp) {
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
                         if (sell > buy) {
-                            update("SatoshiTango", sell, buy, timestamp)
+                            update("ARS", "SatoshiTango", sell, buy, timestamp)
                         } else {
-                            update("SatoshiTango", buy, sell, timestamp)
+                            update("ARS", "SatoshiTango", buy, sell, timestamp)
                         }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: SatoshiTango' } });
-                    console.log("ERROR Crawler: SatoshiTango")
                 }
             }
             done();
@@ -287,13 +321,12 @@ function pushQueue(timestamp) {
                     var buy = parseFloat($('tr:nth-child(4) td:nth-child(3)', '#cotizaciones').text());
                     //console.log(buy, sell)
                     if (sell > buy) {
-                        update("Saldo", sell, buy, timestamp)
+                        update("ARS", "Saldo", sell, buy, timestamp)
                     } else {
-                        update("Saldo", buy, sell, timestamp)
+                        update("ARS", "Saldo", buy, sell, timestamp)
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: Saldo' } });
-                    console.log("ERROR Crawler: Saldo")
                 }
             }
             done();
@@ -314,14 +347,40 @@ function pushQueue(timestamp) {
                     if(isNumber(buy) && isNumber(sell)) {
                         //console.log(buy, sell);
                         if (sell > buy) {
-                            update("Buda", sell, buy, timestamp)
+                            update("ARS", "Buda", sell, buy, timestamp)
                         } else {
-                            update("Buda", buy, sell, timestamp)
+                            update("ARS", "Buda", buy, sell, timestamp)
                         }
                     }
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: Buda' } });
-                    console.log("ERROR Crawler: Buda")
+                }
+            }
+            done();
+        }
+    }]);
+
+    c.queue([{
+        uri: 'https://www.buda.com/api/v2/markets/BTC-CLP/ticker',
+        jQuery: false,
+        callback: function (error, res, done) {
+            if(error){
+                console.log(error);
+            }else{
+                try {
+                    var json = JSON.parse(res.body);
+                    var buy = parseFloat(json.ticker.min_ask);
+                    var sell = parseFloat(json.ticker.last_price);
+                    if(isNumber(buy) && isNumber(sell)) {
+                        //console.log(buy, sell);
+                        if (sell > buy) {
+                            update("CL", "Buda", sell, buy, timestamp)
+                        } else {
+                            update("CL", "Buda", buy, sell, timestamp)
+                        }
+                    }
+                } catch(err) {
+                    Raven.captureException(err, { extra: { key: 'Crawler: Buda' } });
                 }
             }
             done();
@@ -339,77 +398,14 @@ function pushQueue(timestamp) {
                     var json = JSON.parse(res.body);
                     var buy = parseFloat(json.BTC[2]);
                     //console.log(buy)
-                    update("Qubit", buy, 0, timestamp)
+                    update("ARS", "Qubit", buy, 0, timestamp)
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: Qubit' } });
-                    console.log("ERROR Crawler: Qubit")
                 }
             }
             done();
         }
     }]);
-
-    /*c.queue([{
-        uri: 'https://www.bitarg.com/',
-        callback: function (error, res, done) {
-            if(error){
-                console.log(error);
-            }else{
-                try {
-                    var $ = res.$;
-                    var buy = parseFloat($('.tp-banner .lfl').text().replace(/[^0-9\.\,]/g,''));
-                    var sell = parseFloat($('.tp-banner .lfr').text().replace(/[^0-9\.\,]/g,''));
-                    //console.log(buy, sell)
-                    update("BitArg", buy, sell, timestamp)
-                } catch(err) {
-                    Raven.captureException(err, { extra: { key: 'Crawler: BitArg' } });
-                    console.log("ERROR Crawler: BitArg")
-                }
-            }
-            done();
-        }
-    }]);
-
-    c.queue([{
-        uri: 'https://localbitcoins.com/ad/210865/purchase-bitcoin-bank-transfer-argentina-argentina',
-        callback: function (error, res, done) {
-            if(error){
-                console.log(error);
-            }else{
-                try {
-                    var $ = res.$;
-                    var buy = ($('#ad_price').text()).replace(",", "").split(" ");
-                    buy = parseFloat(buy[0]);
-                    //console.log(buy)
-                    update("CoinASAP", buy, null, timestamp)
-                } catch(err) {
-                    Raven.captureException(err, { extra: { key: 'Crawler: CoinASAP purchase' } });
-                    console.log("ERROR Crawler: CoinASAP purchase")
-                }
-            }
-            done();
-        }
-    }]);
-    c.queue([{
-        uri: 'https://localbitcoins.com/ad/210871/cash-out-your-bitcoins-bank-transfer-argentina',
-        callback: function (error, res, done) {
-            if(error){
-                console.log(error);
-            }else{
-                try {
-                    var $ = res.$;
-                    var sell = ($('#ad_price').text()).replace(",", "").split(" ");
-                    sell = parseFloat(sell[0]);
-                    //console.log(sell)
-                    update("CoinASAP", null, sell, timestamp)
-                } catch(err) {
-                    Raven.captureException(err, { extra: { key: 'Crawler: CoinASAP cash out' } });
-                    console.log("ERROR Crawler: CoinASAP cash out")
-                }
-            }
-            done();
-        }
-    }]);*/
 
     c.queue([{
         uri: 'https://www.bitstamp.net/api/v2/ticker/btcusd/',
@@ -442,7 +438,6 @@ function pushQueue(timestamp) {
                     updateGlobalMarket(json, "bitfinex");
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: bitfinex' } });
-                    console.log("ERROR Crawler: bitfinex")
                 }
             }
             done();
@@ -460,10 +455,29 @@ function pushQueue(timestamp) {
                     var json = JSON.parse(res.body);
                     var compra = parseFloat(json[0].Compra);
                     var venta = parseFloat(json[0].Venta);
-                    updateDolar(compra, venta, timestamp);
+                    updateDolar("ARS", compra, venta, timestamp);
                 } catch(err) {
                     Raven.captureException(err, { extra: { key: 'Crawler: cronista' } });
-                    console.log("ERROR Crawler: cronista")
+                }
+            }
+            done();
+        }
+    }]);
+
+    c.queue([{
+        uri: 'https://www.valor-dolar.cl/currencies_rates.json',
+        jQuery: false,
+        callback: function (error, res, done) {
+            if(error){
+                console.log(error);
+            }else{
+                try {
+                    var json = JSON.parse(res.body);
+                    var compra = parseFloat(json.currencies_alternatives.cl_buy);
+                    var venta = parseFloat(json.currencies_alternatives.cl_sell);
+                    updateDolar("CL", compra, venta, timestamp);
+                } catch(err) {
+                    Raven.captureException(err, { extra: { key: 'Crawler: valor-dolar.cl' } });
                 }
             }
             done();
